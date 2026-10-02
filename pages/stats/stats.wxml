@@ -1,0 +1,70 @@
+<view class="page">
+  <view class="header-card">
+    <view class="header-row">
+      <view class="header-title">统计</view>
+      <view class="rate-entry" bindtap="goRates">⚙ 单价设置</view>
+    </view>
+    <view class="mode-list">
+      <view wx:for="{{modes}}" wx:key="value" class="mode {{mode === item.value ? 'active' : ''}}" data-mode="{{item.value}}" bindtap="changeMode">{{item.label}}</view>
+    </view>
+
+    <picker wx:if="{{mode === 'day'}}" mode="date" value="{{selectedDate}}" bindchange="onDateChange">
+      <view class="period-picker">📅 {{selectedDate}}</view>
+    </picker>
+    <picker wx:elif="{{mode === 'month'}}" mode="date" fields="month" value="{{selectedMonth}}" bindchange="onMonthChange">
+      <view class="period-picker">📅 {{selectedMonth}}</view>
+    </picker>
+    <picker wx:else mode="date" fields="year" value="{{selectedYear}}" bindchange="onYearChange">
+      <view class="period-picker">📅 {{selectedYear}}</view>
+    </picker>
+  </view>
+
+  <view class="summary-card">
+    <view class="summary-label">总金额（元）</view>
+    <view class="summary-value">{{totals.amount}}</view>
+  </view>
+
+  <view wx:if="{{hasStats}}">
+    <view wx:if="{{containerRows.length > 0}}" class="stat-block">
+      <view class="stat-title">集装箱统计</view>
+      <scroll-view scroll-x class="table-scroll">
+        <view class="table">
+          <view class="table-row table-head">
+            <view class="cell type">装卸类型</view>
+            <view class="cell">吉重/散货</view>
+            <view class="cell quantity">数量</view>
+            <view class="cell amount">金额（元）</view>
+          </view>
+          <view wx:for="{{containerRows}}" wx:key="key" class="table-row">
+            <view class="cell type">{{item.handlingType}}</view>
+            <view class="cell">{{item.weightType}}</view>
+            <view class="cell quantity">{{item.quantityText}}</view>
+            <view class="cell amount">{{item.amountText}}</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view wx:if="{{foodRows.length > 0}}" class="stat-block">
+      <view class="stat-title">散货统计</view>
+      <scroll-view scroll-x class="table-scroll">
+        <view class="table">
+          <view class="table-row table-head">
+            <view class="cell type">装卸类型</view>
+            <view class="cell">吉重/散货</view>
+            <view class="cell quantity">数量</view>
+            <view class="cell amount">金额（元）</view>
+          </view>
+          <view wx:for="{{foodRows}}" wx:key="key" class="table-row">
+            <view class="cell type">{{item.handlingType}}</view>
+            <view class="cell">{{item.weightType}}</view>
+            <view class="cell quantity">{{item.quantityText}}</view>
+            <view class="cell amount">{{item.amountText}}</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <view wx:else class="empty">当前时间没有可统计的数据</view>
+</view>

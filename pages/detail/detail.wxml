@@ -1,0 +1,114 @@
+<view class="page">
+  <view class="header-card">
+    <view class="header-title">作业明细</view>
+    <view class="header-sub">共 {{filteredRecords.length}} 条记录，点击一行可修改</view>
+  </view>
+
+  <view class="filter-bar">
+    <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+      <view class="filter-picker {{startDate ? 'active' : ''}}">{{startDate || '开始日期'}}</view>
+    </picker>
+    <view class="filter-sep">至</view>
+    <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+      <view class="filter-picker {{endDate ? 'active' : ''}}">{{endDate || '结束日期'}}</view>
+    </picker>
+    <view wx:if="{{hasFilter}}" class="filter-clear" bindtap="clearFilter">清除</view>
+  </view>
+
+  <view class="action-bar">
+    <button class="export-btn" bindtap="exportFile">📥 导出</button>
+  </view>
+
+  <view wx:if="{{showEditor}}" class="editor">
+    <view class="editor-head">
+      <view class="editor-title">修改明细</view>
+      <button class="plain-button" bindtap="cancelEdit">取消</button>
+    </view>
+
+    <picker mode="date" value="{{editForm.date}}" bindchange="onEditDateChange">
+      <view class="date-row">
+        <text class="date-label">日期</text>
+        <text class="date-value">{{editForm.date}}</text>
+      </view>
+    </picker>
+
+    <view class="edit-row">
+      <view class="row-name">机械号</view>
+      <view class="option-list">
+        <view wx:for="{{machineOptions}}" wx:key="*this" class="option {{editForm.machine === item ? 'active' : ''}}" data-field="machine" data-value="{{item}}" bindtap="chooseEditOption">{{item}}</view>
+      </view>
+    </view>
+
+    <view class="edit-row">
+      <view class="row-name">作业类型</view>
+      <view class="option-list">
+        <view wx:for="{{workOptions}}" wx:key="*this" class="option {{editForm.workType === item ? 'active' : ''}}" data-field="workType" data-value="{{item}}" bindtap="chooseEditOption">{{item}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{editForm.workType === '装车' || editForm.workType === '卸车'}}" class="edit-row">
+      <view class="row-name">装卸类型</view>
+      <view class="option-list">
+        <view class="option active">提交箱</view>
+      </view>
+    </view>
+
+    <view wx:if="{{editForm.workType === '装船' || editForm.workType === '卸船'}}" class="edit-row">
+      <view class="row-name">装卸类型（是否散货）</view>
+      <view class="option-list">
+        <view class="option {{editForm.isBulk === false ? 'active' : ''}}" data-isBulk="false" bindtap="chooseEditIsBulk">否</view>
+        <view class="option {{editForm.isBulk === true ? 'active' : ''}}" data-isBulk="true" bindtap="chooseEditIsBulk">是</view>
+      </view>
+    </view>
+
+    <view wx:if="{{editForm.workType}}" class="edit-row">
+      <view class="row-name">吉重/散货</view>
+      <view class="option-list">
+        <view wx:for="{{filteredEditWeightOptions}}" wx:key="*this" class="option {{editForm.weightType === item ? 'active' : ''}}" data-field="weightType" data-value="{{item}}" bindtap="chooseEditOption">{{item}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{showEditBoxType}}" class="edit-row">
+      <view class="row-name">箱型</view>
+      <view class="option-list">
+        <view wx:for="{{boxOptions}}" wx:key="*this" class="option {{editForm.boxType === item ? 'active' : ''}}" data-field="boxType" data-value="{{item}}" bindtap="chooseEditOption">{{item}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{showEditQuantityInput}}" class="edit-row">
+      <view class="row-name">录入数量</view>
+      <input class="quantity-input" type="{{editInputType}}" value="{{editQuantity}}" placeholder="{{editQuantityPlaceholder}}" bindinput="onEditQuantityInput" />
+      <view class="muted">{{editQuantityTip}}</view>
+    </view>
+
+    <view class="editor-actions">
+      <button class="delete-button" bindtap="deleteEditingRecord">删除</button>
+      <button class="save-edit-button" bindtap="saveEditingRecord">保存修改</button>
+    </view>
+  </view>
+
+  <scroll-view wx:if="{{filteredRecords.length > 0}}" scroll-x class="table-scroll">
+    <view class="table">
+      <view class="table-row table-head">
+        <view class="cell date">日期</view>
+        <view class="cell">机械号</view>
+        <view class="cell">装卸类型</view>
+        <view class="cell">作业类型</view>
+        <view class="cell">吉重/散货</view>
+        <view class="cell">箱型</view>
+        <view class="cell quantity">数量</view>
+      </view>
+      <view wx:for="{{filteredRecords}}" wx:key="id" class="table-row {{editingId === item.id ? 'editing' : ''}}" data-id="{{item.id}}" bindtap="startEdit">
+        <view class="cell date">{{item.date}}</view>
+        <view class="cell">{{item.machine}}</view>
+        <view class="cell">{{item.handlingType}}</view>
+        <view class="cell">{{item.workType}}</view>
+        <view class="cell">{{item.weightType}}</view>
+        <view class="cell">{{item.boxType || '-'}}</view>
+        <view class="cell quantity">{{item.quantityText}}</view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view wx:else class="empty">还没有明细记录</view>
+</view>

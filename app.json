@@ -1,0 +1,43 @@
+{
+  "pages": [
+    "pages/entry/entry",
+    "pages/detail/detail",
+    "pages/rates/rates",
+    "pages/stats/stats"
+  ],
+  "window": {
+    "navigationBarTitleText": "吊机作业",
+    "navigationBarBackgroundColor": "#115e59",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f0fdf4"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#94a3b8",
+    "selectedColor": "#0f766e",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/entry/entry",
+        "text": "录入",
+        "iconPath": "images/tab/entry.png",
+        "selectedIconPath": "images/tab/entry_active.png"
+      },
+      {
+        "pagePath": "pages/stats/stats",
+        "text": "统计",
+        "iconPath": "images/tab/stats.png",
+        "selectedIconPath": "images/tab/stats_active.png"
+      },
+      {
+        "pagePath": "pages/detail/detail",
+        "text": "明细",
+        "iconPath": "images/tab/detail.png",
+        "selectedIconPath": "images/tab/detail_active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

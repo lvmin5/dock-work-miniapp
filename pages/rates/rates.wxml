@@ -1,0 +1,52 @@
+<view class="page">
+  <view class="header-card">
+    <view class="header-title">单价设置</view>
+    <view class="header-sub">修改后自动用于统计金额计算</view>
+  </view>
+
+  <view class="rate-table">
+    <view class="rate-row rate-head">
+      <view class="rate-cell kind">吉重/散货</view>
+      <view class="rate-cell price">单价（元）</view>
+      <view class="rate-cell unit">单位</view>
+      <view class="rate-cell action">操作</view>
+    </view>
+    <view wx:for="{{rates}}" wx:key="kind" class="rate-row {{item.isCustom ? 'custom-row' : ''}}">
+      <view class="rate-cell kind">{{item.kind}}</view>
+      <view class="rate-cell price">
+        <input type="digit" value="{{item.price}}" data-kind="{{item.kind}}" bindinput="onPriceInput" />
+      </view>
+      <view class="rate-cell unit">{{item.unit}}</view>
+      <view class="rate-cell action">
+        <text wx:if="{{item.isCustom}}" class="delete-btn" data-kind="{{item.kind}}" bindtap="deleteCustomKind">删除</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-title-bar">
+    <view class="section-title">添加自定义选项</view>
+  </view>
+
+  <view class="custom-form">
+    <view class="custom-row">
+      <view class="custom-label">名称</view>
+      <input class="custom-input" placeholder="输入选项名称" value="{{newKind.kind}}" bindinput="onNewKindInput" data-field="kind" />
+    </view>
+    <view class="custom-row">
+      <view class="custom-label">单价</view>
+      <input class="custom-input" type="digit" placeholder="输入单价" value="{{newKind.price}}" bindinput="onNewKindInput" data-field="price" />
+    </view>
+    <view class="custom-row">
+      <view class="custom-label">单位</view>
+      <input class="custom-input" placeholder="输入单位" value="{{newKind.unit}}" bindinput="onNewKindInput" data-field="unit" />
+    </view>
+    <view class="custom-row">
+      <view class="custom-label">输入类型</view>
+      <view class="option-list">
+        <view class="option {{newKind.inputType === 'integer' ? 'active' : ''}}" data-type="integer" bindtap="onInputTypeChange">整数</view>
+        <view class="option {{newKind.inputType === 'float' ? 'active' : ''}}" data-type="float" bindtap="onInputTypeChange">小数</view>
+      </view>
+    </view>
+    <button class="add-btn" bindtap="addCustomKind">＋ 添加</button>
+  </view>
+</view>

@@ -1,0 +1,72 @@
+<view class="page">
+  <view class="header-card">
+    <view class="header-title">录入作业</view>
+    <view class="date-line">
+      <text class="date-label">日期</text>
+      <picker mode="date" value="{{today}}" bindchange="onDateChange">
+        <view class="date-value">{{today}} ▾</view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="form-section">
+    <view class="form-row">
+      <view class="row-name">机械号</view>
+      <view class="option-list">
+        <view wx:for="{{machineOptions}}" wx:key="*this" class="option {{form.machine === item ? 'active' : ''}}" data-field="machine" data-value="{{item}}" bindtap="chooseOption">{{item}}</view>
+      </view>
+    </view>
+
+    <view class="form-row">
+      <view class="row-name">作业类型</view>
+      <view class="option-list">
+        <view wx:for="{{workOptions}}" wx:key="*this" class="option {{form.workType === item ? 'active' : ''}}" data-field="workType" data-value="{{item}}" bindtap="chooseOption">{{item}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{form.workType === '装车' || form.workType === '卸车'}}" class="form-row">
+      <view class="row-name">装卸类型</view>
+      <view class="option-list">
+        <view class="option active">提交箱</view>
+      </view>
+    </view>
+
+    <view wx:if="{{form.workType === '装船' || form.workType === '卸船'}}" class="form-row">
+      <view class="row-name">装卸类型（是否散货）</view>
+      <view class="option-list">
+        <view class="option {{form.isBulk === false ? 'active' : ''}}" data-isBulk="false" bindtap="chooseIsBulk">否</view>
+        <view class="option {{form.isBulk === true ? 'active' : ''}}" data-isBulk="true" bindtap="chooseIsBulk">是</view>
+      </view>
+    </view>
+
+    <view wx:if="{{form.workType}}" class="form-row">
+      <view class="row-name">吉重/散货</view>
+      <view class="option-list">
+        <view wx:for="{{filteredWeightOptions}}" wx:key="*this" class="option {{form.weightType === item ? 'active' : ''}}" data-field="weightType" data-value="{{item}}" bindtap="chooseOption">{{item}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{showBoxType}}" class="form-row">
+      <view class="row-name">箱型</view>
+      <view class="option-list">
+        <view wx:for="{{boxOptions}}" wx:key="*this" class="option {{form.boxType === item ? 'active' : ''}}" data-field="boxType" data-value="{{item}}" bindtap="chooseOption">{{item}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showModal}}" class="modal-mask" bindtap="closeQuantityModal"></view>
+  <view wx:if="{{showModal}}" class="modal-dialog">
+    <view class="modal-header">
+      <view class="modal-title">输入数量</view>
+    </view>
+    <view class="modal-formula">
+      {{form.machine}} · {{form.handlingType}} · {{form.workType}} · {{form.weightType}}{{form.boxType ? ' · ' + form.boxType : ''}}
+    </view>
+    <input class="modal-input" type="{{inputType}}" value="{{quantity}}" placeholder="{{quantityPlaceholder}}" bindinput="onQuantityInput" focus="{{true}}" />
+    <view class="modal-tip">{{quantityTip}}</view>
+    <view class="modal-actions">
+      <button class="modal-cancel" bindtap="closeQuantityModal">取消</button>
+      <button class="modal-save" disabled="{{!canSave}}" bindtap="saveRecord">保存</button>
+    </view>
+  </view>
+</view>
