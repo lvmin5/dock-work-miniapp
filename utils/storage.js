@@ -96,6 +96,33 @@ function addRecord(record) {
   return nextRecord
 }
 
+function mergeRecords(incomingRecords) {
+  const existing = getRecords()
+  const existingIds = new Set(existing.map((record) => record.id))
+
+  let added = 0
+  let skipped = 0
+  const merged = [...existing]
+
+  incomingRecords.forEach((record) => {
+    const normalized = normalizeRecord(record)
+    const isValid = normalized.machine && normalized.handlingType &&
+      normalized.workType && normalized.weightType && normalized.quantity > 0
+
+    if (!isValid || existingIds.has(normalized.id)) {
+      skipped += 1
+      return
+    }
+
+    merged.push(normalized)
+    existingIds.add(normalized.id)
+    added += 1
+  })
+
+  saveRecords(merged)
+  return { added, skipped, total: merged.length }
+}
+
 function deleteRecord(id) {
   const records = getRecords().filter((record) => record.id !== id)
   saveRecords(records)
@@ -292,6 +319,7 @@ module.exports = {
   isBulkKind,
   isFloatKind,
   isStandardContainer,
+  mergeRecords,
   saveCustomKinds,
   saveRates,
   updateRecord

@@ -184,6 +184,120 @@ Page({
     }
   },
 
+  backupData() {
+    const records = storage.getRecords()
+
+    if (records.length === 0) {
+      wx.showToast({ title: '没有可备份的数据', icon: 'none' })
+      return
+    }
+
+    const payload = {
+      app: 'dock-work-miniapp',
+      type: 'dock-work-backup',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      count: records.length,
+      records
+    }
+
+    const fs = wx.getFileSystemManager()
+    const stamp = storage.getTodayDate().replace(/-/g, '')
+    const fileName = `明细备份_${stamp}.json`
+    const filePath = `${wx.env.USER_DATA_PATH}/${fileName}`
+
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(payload), 'utf8')
+
+      wx.showModal({
+        title: '备份重要提示',
+        content: '清理手机内存时本地备份文件也会被删除。请务必先将备份文件分享到微信「文件传输助手」或好友处保存。',
+        confirmText: '去分享',
+        cancelText: '打开文件',
+        success: (modal) => {
+          if (modal.confirm) {
+            wx.shareFileMessage({
+              filePath,
+              fileName,
+              fail: (err) => {
+                console.error('shareFileMessage fail', err)
+                wx.showToast({ title: '分享失败', icon: 'none' })
+              }
+            })
+          } else {
+            wx.openDocument({
+              filePath,
+              fileType: 'json',
+              showMenu: true,
+              fail: () => wx.showToast({ title: '无法打开，建议分享保存', icon: 'none' })
+            })
+          }
+        }
+      })
+    } catch (error) {
+      console.error('backup fail', error)
+      wx.showToast({ title: '备份失败', icon: 'none' })
+    }
+  },
+
+  importData() {
+    wx.chooseMessageFile({
+      count: 1,
+      type: 'file',
+      extension: ['json'],
+      success: (chooseResult) => {
+        const chosenFile = chooseResult.tempFiles[0]
+        const fs = wx.getFileSystemManager()
+
+        fs.readFile({
+          filePath: chosenFile.path,
+          encoding: 'utf8',
+          success: (readResult) => {
+            let payload
+
+            try {
+              payload = JSON.parse(readResult.data)
+            } catch (error) {
+              wx.showToast({ title: '不是有效的备份文件', icon: 'none' })
+              return
+            }
+
+            if (!payload || payload.type !== 'dock-work-backup' || !Array.isArray(payload.records)) {
+              wx.showToast({ title: '文件格式不正确', icon: 'none' })
+              return
+            }
+
+            if (payload.records.length === 0) {
+              wx.showToast({ title: '备份文件中没有记录', icon: 'none' })
+              return
+            }
+
+            wx.showModal({
+              title: '确认导入',
+              content: `检测到 ${payload.records.length} 条备份记录，将与现有明细合并，重复记录会自动跳过。确定导入吗？`,
+              confirmText: '导入',
+              success: (modal) => {
+                if (!modal.confirm) return
+
+                const result = storage.mergeRecords(payload.records)
+                this.loadRecords()
+
+                wx.showModal({
+                  title: '导入完成',
+                  content: `成功导入 ${result.added} 条，跳过重复/无效 ${result.skipped} 条，当前共 ${result.total} 条。`,
+                  showCancel: false
+                })
+              }
+            })
+          },
+          fail: () => {
+            wx.showToast({ title: '读取文件失败', icon: 'none' })
+          }
+        })
+      }
+    })
+  },
+
   startEdit(event) {
     const editingId = event.currentTarget.dataset.id
     const record = this.data.records.find((item) => item.id === editingId)

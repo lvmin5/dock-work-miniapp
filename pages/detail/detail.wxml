@@ -16,7 +16,9 @@
   </view>
 
   <view class="action-bar">
-    <button class="export-btn" bindtap="exportFile">📥 导出</button>
+    <button class="action-btn backup-btn" bindtap="backupData">📦 备份</button>
+    <button class="action-btn import-btn" bindtap="importData">📂 导入</button>
+    <button class="action-btn export-btn" bindtap="exportFile">📥 导出</button>
   </view>
 
   <view wx:if="{{showEditor}}" class="editor">
